@@ -1,8 +1,10 @@
 inp1 = input()
 inp2 = input()
 amountOfComs, cost = inp1.split()
-eachComListensString = inp2.split()
-for i in eachComListensString:
+eachComListens = inp2.split()
+amountOfComs, cost = int(amountOfComs), int(cost)
+for i in range(0, len(eachComListens)):
+    eachComListens[i] = int(eachComListens[i])
 
 currentBestProfit = 0
 
@@ -11,8 +13,6 @@ for i in range(0, amountOfComs):
     for n in range(i, amountOfComs):
         if eachComListens[n] > cost:
             currentProfit += eachComListens[n] - cost
-        else:
-            break
     if currentProfit > currentBestProfit:
         currentBestProfit = currentProfit
 
