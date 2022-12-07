@@ -2,49 +2,62 @@ import tkinter as tk
 import math
 from PIL import Image, ImageTk
 
-
-window = tk.Tk()
-window.title("MINESWEEPA")
 width, height = int(1920/2), int(1080/2)
-# window.geometry(f"{width}x{height}")
 
-frame = tk.Frame(window)
-frame.pack()
+class Minesweeper():
 
-n_rows = 5
-n_cols = 5
+    def __init__(self, window, columns, rows):
 
-button_size = int((height-24)/n_rows)
+        self.n_rows = rows
+        self.n_cols = columns
+        self.tile_size = int((height-24)/self.n_rows)
 
-image = Image.open(r"tkinter/minesweeper/tile_plain.gif")
-image = image.resize((button_size,button_size), 2)
-im = ImageTk.PhotoImage(image)
+        self.frame = tk.Frame(window)
+        self.frame.pack()
 
-text = tk.Label(frame, text="Yuuuuh", font=("Times new roman", 18))
-text.grid(column=0, columnspan=n_cols, row=0)
-
-tiles = dict()
-count = 1
-for r in range(n_rows):
-    for c in range(n_cols):
-        if c == 0:
-            tiles[r] = {}
+        self.tiles = set()
+        for x in range(self.n_cols):
+            for y in range(self.n_rows):
+                self.tiles.add((x, y))
         
-        tile = {
-            "isMine": False,
-            "cords": {
-                "c": c,
-                "r": r
-            },
-            "button": tk.Button(frame, image=im),
-            "mines": 0,
-            "id": count
-        }
-        tile["button"].grid(column=c, row=r+1)
-        tiles[r][c] = tile
+        self.neighbours = {}
+        for (x, y) in self.tiles:
+            for nx in [x-1, x, x+1]:
+                for ny in [y-1, y, y+1]:
+                    if (nx, ny) != (x, y) and (nx, ny) in self.tiles:
+                        self.neighbours
 
-        count += 1
+        image = Image.open(r"tkinter/minesweeper/tile_plain.gif")
+        image = image.resize((self.tile_size,self.tile_size), 2)    
+        im = ImageTk.PhotoImage(image)
 
-print(tiles[0][0])
+        text = tk.Label(frame, text="Yuuuuh", font=("Times new roman", 18))
+        text.grid(column=0, columnspan=n_cols, row=0)
 
-frame.mainloop()
+
+
+    def setup():
+        tiles = dict()
+        for r in range(n_rows):
+            for c in range(n_cols):
+                if c == 0:
+                    tiles[r] = {}
+                
+                tile = {
+                    "isMine": False,
+                    "cords": {
+                        "c": c,
+                        "r": r
+                    },
+                    "button": tk.Button(frame, image=im),
+                    "mines": 0,  
+                }
+                tile["button"].grid(column=c, row=r+1)
+                tiles[r][c] = tile
+
+def main():
+    window = tk.Tk()
+    minesweeper = Minesweeper(window, 5, 5)
+    window.mainloop()
+
+main()
