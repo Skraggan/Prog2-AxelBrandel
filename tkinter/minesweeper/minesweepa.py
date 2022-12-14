@@ -13,20 +13,21 @@ class Minesweeper():
         self.tile_size = int((height-24)/self.n_rows)
         self.n_bombs = bombs
         self.bombs = set()
+        self.bombs_near = {}
 
         self.frame = tk.Frame(window)
         self.frame.pack()
 
-        self.tiles = set()
+        self.xys = set()
         for x in range(self.n_cols):
             for y in range(self.n_rows):
-                self.tiles.add((x, y))
+                self.xys.add((x, y))
         
         self.neighbours = {}
-        for (x, y) in self.tiles:
+        for (x, y) in self.xys:
             # iterates over a 3x3 grid of each tile and stores a set of each ones neighbours
             self.neighbours[x, y] = set((nx, ny) for nx in [x-1, x, x+1] for ny in [y-1, y, y+1]
-                                        if (nx, ny) != (x, y) and (nx, ny) in self.tiles)
+                                        if (nx, ny) != (x, y) and (nx, ny) in self.xys)
 
         def addBomb():
             x = random.randint(1, self.n_cols)
@@ -58,24 +59,23 @@ class Minesweeper():
         self.setup()
 
     def setup(self):
-        for (x, y) in self.tiles:
-            tile = tk.Button(self.frame, image=self.images["tile_plain"])
+        self.tiles = {}
+        for (x, y) in self.xys:
+            self.tiles[(x, y)] = tile = tk.Button(self.frame, image=self.images["tile_plain"])
             tile.grid(row=y+1, column=x)
 
             def clicked(xy=(x, y)):
-                # self.open(xy)
-                print(xy)
+                self.open(xy)
             tile.config(command=clicked)
 
             def right_clicked(event, xy=(x, y)):
-                print(xy)
+                print(str(xy) + "right click")
             tile.bind("<Button-3>", right_clicked)
 
-            
-
     def open(self, xy):
-        print(xy)
-
+        print(str(xy) + "left click")
+        self.tiles[xy].config(image=self.images["tile_flag"])
+ 
 def main():
     window = tk.Tk()
     minesweeper = Minesweeper(window, 6, 6, 3)
