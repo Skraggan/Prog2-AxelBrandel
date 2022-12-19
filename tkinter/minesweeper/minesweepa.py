@@ -78,7 +78,7 @@ class Minesweeper():
  
 def main():
     window = tk.Tk()
-    minesweeper = Minesweeper(window, 6, 6, 3)
+    minesweeper = Minesweeper(window, 10, 10, 3)
     window.mainloop()
 
 main()
