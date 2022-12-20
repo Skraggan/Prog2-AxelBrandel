@@ -14,6 +14,8 @@ class Minesweeper():
         self.n_bombs = bombs
         self.bombs = set()
         self.bombs_near = {}
+        self.opened = set()
+        self.flagged = set()
 
         self.frame = tk.Frame(window)
         self.frame.pack()
@@ -60,25 +62,51 @@ class Minesweeper():
 
     def setup(self):
         self.tiles = {}
-        for (x, y) in self.xys:
-            self.tiles[(x, y)] = tile = tk.Button(self.frame, image=self.images["tile_plain"])
-            tile.grid(row=y+1, column=x)
+        for xy in self.xys:
 
-            def clicked(xy=(x, y)):
+            self.tiles[xy] = tile = tk.Button(self.frame, image=self.images["tile_plain"])
+            tile.grid(row=xy[1]+1, column=xy[0])
+        
+
+            def clicked(xy=xy):
                 self.open(xy)
             tile.config(command=clicked)
 
-            def right_clicked(event, xy=(x, y)):
-                print(str(xy) + "right click")
+            def right_clicked(event, xy=xy):
+                if xy not in self.flagged:
+                    self.flagged.add(xy)
+                    print(str(xy) + "flag added")
+                else:
+                    self.flagged.remove(xy=xy)
+                    print(str(xy) + "flag removed")
+                
+                self.refresh(xy)
             tile.bind("<Button-3>", right_clicked)
 
     def open(self, xy):
+        if xy in self.opened:
+            return
         print(str(xy) + "left click")
-        self.tiles[xy].config(image=self.images["tile_flag"])
+
+        self.opened.add(xy)
+
+        if xy in self.bombs:
+            self.bombs_near[xy] = "mine"
+        else:
+            self.bombs_near[xy] = len(self.neighbours[xy] & self.bombs)
+
+        self.refresh(xy)
+
+    def refresh(self, xy):
+        tile = self.tiles[xy]
+        bn = self.bombs_near[xy]
+        if bn == 0: bn = "clicked"
+        tile.config(image=self.images[f"tile_{bn}"])
+        print(self.opened)
  
 def main():
     window = tk.Tk()
-    minesweeper = Minesweeper(window, 10, 10, 3)
+    minesweeper = Minesweeper(window, 10, 10, 10)
     window.mainloop()
 
 main()
