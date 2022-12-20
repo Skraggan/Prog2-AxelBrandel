@@ -88,13 +88,14 @@ class Minesweeper():
         self.opened.add(xy)
         
         if xy in self.bombs:
-            self.bombs_near[xy] = "mine"
+            self.bombs_near[xy] = "wrong"
             self.lose()
         else:
             self.bombs_near[xy] = len(self.neighbours[xy] & self.bombs)
         
+        
         for neighbour in self.neighbours[xy]:
-            if len(self.neighbours[neighbour] & self.bombs) == 0:
+            if len(self.neighbours[neighbour] & self.bombs) == 0 or self.bombs_near[xy] == 0:
                 self.auto_open(neighbour)
 
         self.refresh(xy)
