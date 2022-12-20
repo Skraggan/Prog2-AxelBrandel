@@ -7,11 +7,11 @@ width, height = int(1920/2), int(1080/2)
 
 class Minesweeper():
 
-    def __init__(self, window, columns, rows, bombs):
+    def __init__(self, window, columns, rows, bomb_density):
         self.n_rows = rows
         self.n_cols = columns
         self.tile_size = int((height-24)/self.n_rows)
-        self.n_bombs = bombs
+        self.n_bombs = int(bomb_density*columns*rows)
         self.bombs = set()
         self.bombs_near = {}
         self.opened = set()
@@ -77,36 +77,59 @@ class Minesweeper():
                     self.flagged.add(xy)
                     print(str(xy) + "flag added")
                 else:
-                    self.flagged.remove(xy=xy)
-                    print(str(xy) + "flag removed")
-                
+                    self.flagged.remove(xy)
+                    print(str(xy) + "flag removed")  
                 self.refresh(xy)
             tile.bind("<Button-3>", right_clicked)
 
     def open(self, xy):
         if xy in self.opened:
             return
-        print(str(xy) + "left click")
-
         self.opened.add(xy)
-
+        
         if xy in self.bombs:
             self.bombs_near[xy] = "mine"
+            self.lose()
         else:
             self.bombs_near[xy] = len(self.neighbours[xy] & self.bombs)
+        
+        for neighbour in self.neighbours[xy]:
+            if len(self.neighbours[neighbour] & self.bombs) == 0:
+                self.auto_open(neighbour)
 
         self.refresh(xy)
 
+    def auto_open(self, xy):
+        if xy in self.opened or xy in self.bombs:
+            return
+        else:
+            self.opened.add(xy)
+            self.bombs_near[xy] = len(self.neighbours[xy] & self.bombs)
+            self.refresh(xy)
+        if self.bombs_near[xy] == 0:
+            for neighbour in self.neighbours[xy]:
+                self.auto_open(neighbour)
+
     def refresh(self, xy):
         tile = self.tiles[xy]
-        bn = self.bombs_near[xy]
-        if bn == 0: bn = "clicked"
-        tile.config(image=self.images[f"tile_{bn}"])
-        print(self.opened)
+        if xy in self.opened:
+            bn = self.bombs_near[xy]
+            if bn == 0: bn = "clicked"
+            tile.config(image=self.images[f"tile_{bn}"])
+        elif xy in self.flagged:
+            tile.config(image=self.images["tile_flag"])
+        else:
+            tile.config(image=self.images["tile_plain"])
+        print(self.flagged)
  
+    def lose(self):
+        for xy in self.xys:
+            if xy in self.bombs:
+                self.tiles[xy].config(image=self.images["tile_mine"])
+    
 def main():
     window = tk.Tk()
-    minesweeper = Minesweeper(window, 10, 10, 10)
+    minesweeper = Minesweeper(window, 20, 20, 0.3)
     window.mainloop()
 
 main()
