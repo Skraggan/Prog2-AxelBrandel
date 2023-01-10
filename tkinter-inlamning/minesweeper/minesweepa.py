@@ -1,5 +1,4 @@
 import tkinter as tk
-import math
 from PIL import Image, ImageTk
 import random
 
@@ -36,7 +35,7 @@ class Minesweeper():
 
         # resizes the images to fit the tiles in the frame
         def loadImage(img):
-            image = Image.open(r"tkinter/minesweeper/" + str(img))
+            image = Image.open(r"tkinter-inlamning/minesweeper/" + str(img))
             image = image.resize((self.tile_size,self.tile_size), 2)    
             return ImageTk.PhotoImage(image)
 
