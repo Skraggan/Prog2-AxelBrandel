@@ -1,17 +1,38 @@
 import socket
 import threading
 
-ip, port = socket.gethostname(), 1234
+IP, PORT = socket.gethostname(), 1234
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((ip, port))
-s.listen(5)
-print(f"Server is up and running on {ip}:{port}")
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((IP, PORT))
+server.listen()
+print(f"Server is up and running on {IP}:{PORT}")
 
-sockets_list = [s]
-clients = {}
+clients = []
+
+def broadcast(msg):
+    for client in clients:
+        client.send(msg)
+
+def handle(client, address):
+    while True:
+        try:
+            message = client.recv(1024).decode("utf-8")
+            print(f"Client {str(address)} says: {message}")
+            broadcast(message)
+        except:
+            clients.remove(client)
+            print(f"Client {address} disconnected!")
+            client.close()
+            pass
+
+print("Server running...")
 
 while True:
-    conn, addr = s.accept()
-    print(f"Connection from {addr} had been established!")
-    conn.send(bytes("You have been connected!", "utf-8"))
+    conn, addr = server.accept()
+    print(f"Connection from {str(addr)} had been established!")
+    clients.append(conn)
+    broadcast(f"Client {addr} connected to the server".encode("utf-8"))
+    conn.send("Connected to the server!".encode("utf-8"))
+    thread = threading.Thread(target=handle, args=(conn, addr))
+    thread.start()
