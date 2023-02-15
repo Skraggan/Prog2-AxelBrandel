@@ -17,7 +17,7 @@ def broadcast(msg):
 def handle(client, address):
     while True:
         try:
-            message = client.recv(1024).decode("utf-8")
+            message = client.recv(2048).decode("utf-8")
             print(f"Client {str(address)} says: {message}")
             broadcast(message)
         except:

@@ -1,6 +1,8 @@
 import tkinter as tk
 from client import Client
 
+HEADERSIZE = 5
+
 root = tk.Tk()
 root.geometry("1050x570-100-70")
 root.resizable(False, False)
@@ -25,6 +27,10 @@ def draw_line(draw):
     global current_x, current_y
     line = canvas.create_line(current_x, current_y, draw.x, draw.y, width=draw_size, fill="black", capstyle=tk.ROUND, smooth=True)
     current_x, current_y = draw.x, draw.y
+    # print(current_x, current_y, draw.x, draw.y)
+    msg = f"{current_x},{current_y},{draw.x},{draw.y}"
+    msg = f"{len(msg):<5}"+ msg
+    c.client.send(msg.encode("utf-8"))
 
 canvas.bind("<Button-1>", locate_xy)
 canvas.bind("<B1-Motion>", draw_line)
